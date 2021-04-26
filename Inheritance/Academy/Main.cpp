@@ -63,7 +63,7 @@ public:
 		cout << "First name:" << first_name << endl;
 		cout << "Age:\t\t" << age << " years" << endl;*/
 		//cout << "Birth date:" << birth_date << endl;
-		cout << last_name << " " << first_name << ", " << age << " ëåò" << endl;
+		cout << last_name << " " << first_name << ", " << age << " лет" << endl;
 	}
 };
 
@@ -101,8 +101,8 @@ public:
 	//		Constructors
 	Student
 	(
-		const string& last_name, const string& first_name, unsigned int age,//Àòðèáóòû áàçîâîãî êëàññà
-		const string& speciality, const string& group, double rating	//Àòðèáóòû íàøåãî êëàññà
+		const string& last_name, const string& first_name, unsigned int age,//Атрибуты базового класса
+		const string& speciality, const string& group, double rating	//Атрибуты нашего класса
 	) :Human(last_name, first_name, age)
 	{
 		set_speciality(speciality);
@@ -119,7 +119,7 @@ public:
 	void info()const
 	{
 		Human::info();
-		cout << speciality << ", " << group << ", óñïåâàåìîñòü: " << rating << endl;
+		cout << speciality << ", " << group << ", успеваемость: " << rating << endl;
 	}
 };
 
@@ -164,16 +164,16 @@ public:
 	void info()const
 	{
 		Human::info();
-		cout << speciality << ", îïûò ïðåïîäàâàíèÿ " << experience << " ëåò." << endl;
+		cout << speciality << ", опыт преподавания " << experience << " лет." << endl;
 	}
 };
 
 void main()
 {
 	setlocale(LC_ALL, "");
-	/*Human human("Òóïåíêî", "Âàñèëèé", 18);
+	/*Human human("Тупенко", "Василий", 18);
 	human.info();*/
-	Student vasya("Òóïåíêî", "Âàñèëèé", 18, "Ïðîãðàììèðîâàíèå", "BV_011", 4.5);
+	Student vasya("Тупенко", "Василий", 18, "Программирование", "BV_011", 4.5);
 	vasya.info();
 
 	Teacher teacher("Einstein", "Albert", 150, "Phisics", 120);
