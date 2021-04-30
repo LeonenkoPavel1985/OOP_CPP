@@ -54,5 +54,10 @@ void Human::info()const
 	cout << "First name:" << first_name << endl;
 	cout << "Age:\t\t" << age << " years" << endl;*/
 	//cout << "Birth date:" << birth_date << endl;
-	cout << last_name << " " << first_name << ", " << age << " ëåò" << endl;
+	cout << last_name << " " << first_name << ", " << age << " лет" << endl;
+}
+
+ostream& operator<<(ostream& os, const Human& obj)
+{
+	return os << obj.get_last_name() << " " << obj.get_first_name() << ", " << obj.get_age() << " лет";
 }

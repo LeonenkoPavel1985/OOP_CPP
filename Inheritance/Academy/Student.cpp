@@ -29,8 +29,8 @@ void Student::set_rating(double rating)
 //		Constructors
 Student::Student
 (
-	HUMAN_TAKE_PARAMETERS,//Àòðèáóòû áàçîâîãî êëàññà
-	STUDENT_GET_PARAMETERS	//Àòðèáóòû íàøåãî êëàññà
+	HUMAN_TAKE_PARAMETERS,//Атрибуты базового класса
+	STUDENT_GET_PARAMETERS	//Атрибуты нашего класса
 ) :Human(HUMAN_GIVE_PARAMETERS)
 {
 	set_speciality(speciality);
@@ -47,5 +47,10 @@ Student::~Student()
 void Student::info()const
 {
 	Human::info();
-	cout << speciality << ", " << group << ", óñïåâàåìîñòü: " << rating << endl;
+	cout << speciality << ", " << group << ", успеваемость: " << rating << endl;
+}
+
+ostream& operator<<(ostream& os, const Student& obj)
+{
+	return os << (Human)obj << ", " << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_rating();
 }

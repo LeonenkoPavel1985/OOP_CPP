@@ -2,7 +2,7 @@
 #include"Student.h"
 class Graduate :public Student
 {
-	string topic;	//Òåìà äèïëîìíîãî ïðîåêòà
+	string topic;	//Тема дипломного проекта
 public:
 	const string& get_topic()const;
 	void set_topic(const string& topic);
@@ -11,3 +11,5 @@ public:
 	~Graduate();
 	void info()const;
 };
+
+ostream& operator<<(ostream& os, const Graduate& obj);
