@@ -5,6 +5,7 @@ using namespace std;
 
 #define DEBUG
 
+
 class Tree
 {
 protected:
