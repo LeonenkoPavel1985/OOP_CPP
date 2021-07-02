@@ -1,135 +1,208 @@
-#include<iostream>
+#include <iostream>
 using namespace std;
-
 #define tab "\t"
+//#define DEBUG
+//#define BASE_CHECK
+template<typename T> class Tree;
+template<typename T> class UniqueTree;
 
-#define DEBUG
-
-class Tree
+template<typename T> class Tree
 {
 protected:
 	class Element
 	{
-		int Data;
+		T Data;
 		Element* pLeft;
 		Element* pRight;
 	public:
-		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr) :Data(Data), pLeft(pLeft), pRight(pRight)
+		Element(T Data, Element* pLeft = nullptr, Element* pRight = nullptr) :Data(Data), pLeft(pLeft), pRight(pRight)
 		{
 #ifdef DEBUG
-			cout << "EConstructor:\t" << this << endl;
+			cout << "EConstructor:" << tab << this << endl;
 #endif // DEBUG
-
 		}
+
 		~Element()
 		{
 #ifdef DEBUG
-			cout << "EDestructor:\t" << this << endl;
+			cout << "EDestructor:" << tab << this << endl;
 #endif // DEBUG
-
 		}
+
 		bool is_leaf()const
 		{
 			return pLeft == pRight;
 		}
-		friend class Tree;
-		friend class UniqueTree;
-	}*Root;
+
+		friend class Tree<T>;
+		friend class UniqueTree<T>;
+	} *Root;
+
 public:
-	Element* getRoot()const
+	Element* getRoot() const
 	{
 		return Root;
 	}
 	Tree() :Root(nullptr)
 	{
-		cout << "TConstructor:\t" << this << endl;
+#ifdef DEBUG
+		cout << "TConstructor:" << tab << this << endl;
+#endif // DEBUG
 	}
-	Tree(const initializer_list<int>& il) :Tree()
+	Tree(const initializer_list<T>& il) :Tree<T>()
 	{
-		for (int const* it = il.begin(); it != il.end(); it++)
+		for (T const* it = il.begin(); it != il.end(); it++)
+		{
 			insert(*it, Root);
+		}
 	}
-	Tree(const Tree& other) :Root()
+	Tree(const Tree<T>& other)
 	{
-		cout << "CopyConstructor:" << this << endl;
+#ifdef DEBUG
+		cout << "CopyTConstructor:" << tab << this << endl;
+#endif // DEBUG
 		copy(other.Root);
 	}
 	~Tree()
 	{
 		clear();
-		cout << "TDestructor:\t" << this << endl;
+#ifdef DEBUG
+		cout << "TDestructor:" << tab << this << endl;
+#endif // DEBUG
 	}
 
-	//			Operators:
-	Tree& operator=(const Tree& other)
+	//	Operators:
+	Tree<T>& operator=(const Tree<T>& other)
 	{
 		if (this == &other)return *this;
 		clear(Root);
 		copy(other.Root);
-		cout << "CopyAssignment:\t" << this << endl;
+#ifdef DEBUG
+		cout << "CopyAsignmentTConstructor:" << tab << this << endl;
+#endif // DEBUG
 	}
-
-	void insert(int Data)
+	T minValue() const
 	{
-		insert(Data, this->Root);
+		return minValue(Root);
 	}
-	void erase(int Data)
+	T maxValue() const
 	{
-		erase(Data, Root);
+		return maxValue(Root);
 	}
-	void clear()
-	{
-		clear(Root);
-		this->Root = nullptr;
-	}
-	int minValue()const
-	{
-		return minValue(this->Root);
-	}
-	int maxValue()const
-	{
-		return maxValue(this->Root);
-	}
-	int count()const
+	T count() const
 	{
 		return count(Root);
 	}
-	int sum()const
+	T sum() const
 	{
 		return sum(Root);
 	}
-	double avg()const
+	double avg() const
 	{
 		return avg(Root);
 	}
-	void print()const
+	void insert(T Data)
+	{
+		insert(Data, Root);
+	}
+	void erase(T Data)
+	{
+		erase(Data, this->Root);
+	}
+	void clear()
+	{
+		clear(this->Root);
+		this->Root = nullptr;
+	}
+	void print() const
 	{
 		print(Root);
 		cout << endl;
 	}
 private:
-	void insert(int Data, Element* Root)
+	T minValue(Element* Root) const
 	{
-		if (this->Root == nullptr)this->Root = new Element(Data);
-		if (Root == nullptr)return;
-		if (Data < Root->Data)
+		/*if (Root->pLeft == nullptr)
 		{
-			if (Root->pLeft == nullptr)Root->pLeft = new Element(Data);
-			else insert(Data, Root->pLeft);
+			return Root->Data;
 		}
 		else
 		{
-			/*if (Root->pRight == nullptr)Root->pRight = new Element(Data);
-			else insert(Data, Root->pRight);*/
-			if (Root->pRight)insert(Data, Root->pRight);
+			return minValue(Root->pLeft);
+		}*/
+		return Root->pLeft ? minValue(Root->pLeft) : Root->Data;
+	}
+	T maxValue(Element* Root) const
+	{
+		return Root->pRight ? maxValue(Root->pRight) : Root->Data;
+	}
+	T count(Element* Root) const
+	{
+
+		/*if (!Root) return 0;
+		return count(Root->pLeft) + count(Root->pRight) + 1;*/
+
+		return Root ? count(Root->pLeft) + count(Root->pRight) + 1 : 0;
+	}
+	T sum(Element* Root) const
+	{
+		return Root ? sum(Root->pLeft) + sum(Root->pRight) + Root->Data : 0;
+	}
+
+	double avg(Element* Root) const
+	{
+		return (double)sum(Root) / count(Root);
+	}
+
+	void insert(T Data, Element* Root)
+	{
+		if (this->Root == nullptr)
+		{
+			this->Root = new Element(Data);
+		}
+
+		if (Root == nullptr) return;
+
+		if (Data < Root->Data)
+		{
+			if (Root->pLeft == nullptr)
+			{
+				Root->pLeft = new Element(Data);
+			}
+			else
+			{
+				insert(Data, Root->pLeft);
+			}
+		}
+		else
+		{
+			/*if (Root->pRight == nullptr)
+			{
+				Root->pRight = new Element(Data);
+			}
+			else
+			{
+				insert(Data, Root->pRight);
+			}*/
+
+			if (Root->pRight) insert(Data, Root->pRight);
 			else Root->pRight = new Element(Data);
+
 		}
 	}
-	void erase(int Data, Element*& Root)
+	void clear(Element* Root)
 	{
-		if (Root == nullptr)return;
+		if (Root == nullptr) return;
+		clear(Root->pLeft);
+		clear(Root->pRight);
+		delete Root;
+	}
+	void erase(T Data, Element*& Root)
+	{
+		if (Root == nullptr) return;
 		erase(Data, Root->pLeft);
 		erase(Data, Root->pRight);
+
 		if (Data == Root->Data)
 		{
 			if (Root->is_leaf())
@@ -152,41 +225,10 @@ private:
 			}
 		}
 	}
-	void clear(Element* Root)
+	void print(Element* Root) const
 	{
-		if (Root == nullptr)return;
-		clear(Root->pLeft);
-		clear(Root->pRight);
-		delete Root;
-	}
-	int minValue(Element* Root)const
-	{
-		if (Root->pLeft == nullptr)return Root->Data;
-		else return minValue(Root->pLeft);
-	}
-	int maxValue(Element* Root)const
-	{
-		//return Root->pRight == nullptr ? Root->Data : maxValue(Root->pRight);
-		return Root->pRight ? maxValue(Root->pRight) : Root->Data;
-	}
-	int count(Element* Root)const
-	{
-		/*if (Root == nullptr)return 0;
-		return count(Root->pLeft) + count(Root->pRight) + 1;*/
-		return Root ? count(Root->pLeft) + count(Root->pRight) + 1 : 0;
-		//return !Root ? 0 : count(Root->pLeft) + count(Root->pRight) + 1;
-	}
-	int sum(Element* Root)const
-	{
-		return Root == nullptr ? 0 : sum(Root->pLeft) + sum(Root->pRight) + Root->Data;
-	}
-	double avg(Element* Root)const
-	{
-		return (double)sum(Root) / count(Root);
-	}
-	void print(Element* Root)const
-	{
-		if (Root == nullptr)return;
+		if (Root == nullptr) return;
+
 		print(Root->pLeft);
 		cout << Root->Data << tab;
 		print(Root->pRight);
@@ -194,85 +236,125 @@ private:
 
 	void copy(Element* Root)
 	{
-		if (Root == nullptr)return;
+		if (Root == nullptr) return;
 		insert(Root->Data, this->Root);
 		copy(Root->pLeft);
 		copy(Root->pRight);
 	}
 };
-
-class UniqueTree :public Tree
+template<typename T> class UniqueTree : public Tree<T>
 {
-	void insert(int Data, Element* Root)
+protected:
+	void insert(T Data, Tree<T>::Element* Root)
 	{
-		if (this->Root == nullptr)this->Root = new Element(Data);
-		if (Root == nullptr)return;
+		if (this->Root == nullptr)
+		{
+			this->Root = new typename Tree<T>::Element(Data);
+		}
+
+		if (Root == nullptr) return;
+
 		if (Data < Root->Data)
 		{
-			if (Root->pLeft == nullptr)Root->pLeft = new Element(Data);
-			else insert(Data, Root->pLeft);
+			if (Root->pLeft == nullptr)
+			{
+				Root->pLeft = new typename Tree<T>::Element(Data);
+			}
+			else
+			{
+				insert(Data, Root->pLeft);
+			}
 		}
 		if (Data > Root->Data)
 		{
-			/*if (Root->pRight == nullptr)Root->pRight = new Element(Data);
-			else insert(Data, Root->pRight);*/
-			if (Root->pRight)insert(Data, Root->pRight);
-			else Root->pRight = new Element(Data);
+			/*if (Root->pRight == nullptr)
+			{
+				Root->pRight = new Element(Data);
+			}
+			else
+			{
+				insert(Data, Root->pRight);
+			}*/
+
+			if (Root->pRight) insert(Data, Root->pRight);
+			else Root->pRight = new typename Tree<T>::Element(Data);
+
 		}
 	}
 public:
-	void insert(int Data)
+	//UniqueTree(const initializer_list<T>& il) :Tree<T>(*il);
+	void insert(T Data)
 	{
-		insert(Data, Root);
+		insert(Data, this->Root);
 	}
 };
-
-//#define BASE_CHECK
-
 void main()
 {
-	setlocale(LC_ALL, "Russian");
-
+setlocale(LC_ALL, "Russian");
 #ifdef BASE_CHECK
 	int n;
-	cout << "Введите размер дерева: "; cin >> n;
+	cout << "Введите размер дерева:"; cin >> n;
 	Tree tree;
 	for (int i = 0; i < n; i++)
 	{
 		tree.insert(rand() % 100);
 	}
-	//tree.insert(-2, tree.getRoot());
-	tree.print();
-	cout << "Минимальное значение в дереве:  " << tree.minValue() << endl;
-	cout << "Максимальное значение в дереве: " << tree.maxValue() << endl;
-	cout << "Количество элементов дерева:    " << tree.count() << endl;
-	cout << "Сумма элементов дерева:		 " << tree.sum() << endl;
-	cout << "Среднее арифметическое элементов дерева: " << tree.avg() << endl;
-
-	int value;
-	cout << "Введите значение удаляемого элемента: "; cin >> value;
-	tree.erase(value);
-	tree.print();
-
 	UniqueTree u_tree;
 	for (int i = 0; i < n; i++)
 	{
 		u_tree.insert(rand() % 100);
-	}
+	
+	//	tree.insert(-2, tree.getRoot());
+	tree.print();
+	cout << "Минимальное значение в дереве: " << tree.minValue() << endl;
+	cout << "Максимальное значение в дереве: " << tree.maxValue() << endl;
+	cout << "Количество элементов в дереве: " << tree.count() << endl;
+	cout << endl;
+	cout << "sum: " << tree.sum() << endl;
+	cout << "avg: " << tree.avg() << endl;
+	int value;
+	cout << "Введите значение удаляемого значения: "; cin >> value;
+	tree.erase(value);
+	tree.print();
+	cout << endl;
+	cout << "\n:: Вызов без передачи корня ::\n";
+	tree.print();
+	cout << "Минимальное значение в дереве: " << tree.minValue() << endl;
+	cout << "Максимальное значение в дереве: " << tree.maxValue() << endl;
+	cout << "Количество элементов в дереве: " << tree.count() << endl;
+	cout << endl;
+	cout << "sum: " << tree.sum() << endl;
+	cout << "avg: " << tree.avg() << endl;
+	cout << "\n:: Уникальне дерево ::\n";
+	//	u_tree.insert(-2, u_tree.getRoot());
 	u_tree.print();
 	cout << endl;
-	cout << "Количество элементов дерева:    " << u_tree.count() << endl;
+	cout << "Минимальное значение в дереве: " << u_tree.minValue() << endl;
+	cout << "Максимальное значение в дереве: " << u_tree.maxValue() << endl;
+	cout << "Количество элементов в дереве: " << u_tree.count() << endl;
+	cout << endl;
+	cout << "sum: " << u_tree.sum() << endl;
+	cout << "avg: " << u_tree.avg() << endl;
 
-	//Tree tree2 = tree;	//CopyConstructor
+	//Tree tree2 = tree;
 	Tree tree2;
 	tree2 = tree;
-	tree2.print();
+	tree2.print(); TemplatedTree
 #endif // BASE_CHECK
-
-	Tree tree = { 50, 25,80, 16,32,64,85, 12,22,31,58,77,84,91 };
+	
+	//UniqueTree<int> u_tree = { 50, 25, 80, 16, 32, 64, 85, 12, 22 ,31 ,58 ,77 ,84 ,91 };
+		int n;
+	cout << "Введите размер дерева:"; cin >> n;
+	UniqueTree<double> u_tree;
+	for (int i = 0; i < n; i++)
+	{
+		u_tree.insert((double)(rand() % 1000)/100);
+	}
+	u_tree.print();
+	Tree<double> tree = { 50.5, 25.5, 80.5, 16.5, 32.5, 64.5, 85.5, 12.0, 22.0, 31.0, 58.0, 77.0, 84.0, 91.0 };
 	tree.print();
-	int value;
-	cout << "Введите значение удаляемого элемента: "; cin >> value;
+	double value;
+	cout << "Введите значение удаляемого значения: "; cin >> value;
 	tree.erase(value);
 	tree.print();
 }
