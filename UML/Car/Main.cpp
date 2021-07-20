@@ -8,6 +8,7 @@ const unsigned int DEFAULT_TANK_VOLUME = 60;
 const unsigned int MIN_FUEL_LEVEL = 5;
 const double DEFAULT_ENGINE_CONSUMPTION = 8;
 const unsigned int DEFAULT_MAX_SPEED = 250;
+const unsigned int DEFAULT_ACCELLERATION = 10;
 
 enum Keys
 {
@@ -65,7 +66,6 @@ public:
 class Engine
 {
 	//Этот класс описывает двигатель
-
 	const double CONSUMPTION;	//расход 100 км.
 	double consumtion_per_second;	//расход за одну секунду
 
@@ -79,6 +79,13 @@ public:
 	double get_consumption_per_second()const
 	{
 		return consumtion_per_second;
+	}
+	void set_consumption_per_second(double consumption)
+	{
+		if (consumption > -.0003 && consumption <= .003)
+		{
+			this->consumtion_per_second = consumption;
+		}
 	}
 	bool is_started()const
 	{
@@ -141,7 +148,7 @@ public:
 		tank(tank_volume),
 		speed(0),
 		MAX_SPEED(MAX_SPEED >= 100 && MAX_SPEED <= 350 ? MAX_SPEED : DEFAULT_MAX_SPEED),
-		accelleration(5),
+		accelleration(DEFAULT_ACCELLERATION),
 		driver_inside(false)
 	{
 		cout << "Your car is ready to go. Press Enter to get in." << this << endl;
@@ -157,6 +164,7 @@ public:
 	}
 	void get_out()
 	{
+		if (speed > 20) throw std::exception("You left your car on high speed, you need a doctor.");
 		driver_inside = false;
 		if (control.panel_thread.joinable())control.panel_thread.join();	//Останавливаем поток, отображающий панель приборов
 	}
@@ -169,6 +177,7 @@ public:
 			cout << "Fuel level: " << tank.get_fuel_level() << " liters";
 			if (tank.get_fuel_level() < MIN_FUEL_LEVEL)cout << "LOW FUEL";
 			cout << endl;
+			cout << "Engine consumption per second: " << engine.get_consumption_per_second() << endl;
 			cout << "Speed: " << speed << " km/h" << endl;
 			std::this_thread::sleep_for(1s);
 		}
@@ -205,6 +214,41 @@ public:
 			this_thread::sleep_for(1s);
 		}
 	}
+	void accelerate()
+	{
+		if (engine.is_started() && speed < MAX_SPEED)
+	    {
+		speed += accelleration;
+		if (control.free_wheeling_thread.get_id() == std::thread::id())
+		control.free_wheeling_thread = std::thread(&Car::free_wheeling, this);
+		adjust_consumption();
+		}
+		std::this_thread::sleep_for(1s);
+	}
+	void slow_down()
+	{
+		if (speed > 0)
+		{
+			speed -= accelleration;
+			if (speed < accelleration)
+			{
+				speed = 0;
+				if (control.free_wheeling_thread.joinable())
+					control.free_wheeling_thread.join();
+			}
+			adjust_consumption();
+		}
+		std::this_thread::sleep_for(1s);
+	}
+	void adjust_consumption()
+	{
+		if (speed > 0 && speed <= 60)engine.set_consumption_per_second(.002);
+		else if (speed > 60 && speed <= 100)engine.set_consumption_per_second(.0014);
+		else if (speed > 100 && speed <= 140)engine.set_consumption_per_second(.002);
+		else if (speed > 140 && speed <= 200)engine.set_consumption_per_second(.0025);
+		else if (speed > 200)engine.set_consumption_per_second(.003);
+		else if (speed == 0)engine.set_consumption_per_second(engine.get_consumption() * 5e-5);
+	}
 	void control_car()
 	{
 		char key;
@@ -228,25 +272,10 @@ public:
 				else start();
 				break;
 			case 'W':case 'w':case ArrowUp://Gas - газ, разгон
-				if (engine.is_started() && speed < MAX_SPEED)
-				{
-					speed += accelleration;
-					if (control.free_wheeling_thread.get_id() == std::thread::id())
-						control.free_wheeling_thread = std::thread(&Car::free_wheeling,this);
-				}
+				accelerate();
 				break;
 			case ArrowDown:case Space:case 'S':case 's':
-				if (speed > 0)
-				{
-					speed -= accelleration;
-					if (speed < accelleration)
-					{
-						speed = 0;
-						if (control.free_wheeling_thread.joinable())
-							control.free_wheeling_thread.join();
-					}
-				}
-
+				slow_down();
 				break;
 			case Escape:
 				stop();
@@ -292,5 +321,12 @@ void main()
 
 	Car car(8, 40);
 	car.info();
-	car.control_car();
+	try
+	{
+		car.control_car();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << endl;
+	}
 }
