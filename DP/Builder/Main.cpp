@@ -135,7 +135,7 @@ public:
 	}
 	void setCPU()
 	{
-		computer->setCPU("Ryzen i9");
+		computer->setCPU("Ryzen 9");
 	}
 	void setGPU()
 	{
