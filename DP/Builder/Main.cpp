@@ -1,21 +1,31 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include<string>
 #include<ctime>
+
 using namespace std;
+
 //	Product
 class Computer
 {
+	string type;
 	string CPU;
 	string GPU;
 	string RAM;
 	string Disk;
-	bool on; // включение-выключение.
+	bool is_on;
+
 public:
 	Computer()
 	{
-		on = false;
+		is_on = false;
 	}
 
+	void setType(const std::string& type)
+	{
+		this->type = type;
+	}
 	void setCPU(const string CPU)
 	{
 		this->CPU = CPU;
@@ -34,11 +44,13 @@ public:
 	}
 	void power_button()
 	{
-		on = on ? false : true;
+		is_on = is_on ? false : true;
 	}
 	void info()
 	{
-		if (on)
+		cout << "\n--------------------------------------\n";
+		cout << "Type: " << type << endl;
+		if (is_on)
 		{
 			cout << "System properties: " << endl;
 			cout << " CPU: " << CPU << endl;
@@ -50,8 +62,10 @@ public:
 		{
 			cout << "Computer is off" << endl;
 		}
+		cout << "\n--------------------------------------\n";
 	}
 };
+
 //	Abstravt builder
 class ComputerBuilder
 {
@@ -72,18 +86,22 @@ public:
 		return this->computer;
 	}
 
+	virtual void setType() = 0;
 	virtual void setCPU() = 0;
 	virtual void setGPU() = 0;
 	virtual void setRAM() = 0;
 	virtual void setDisk() = 0;
 };
+
 // Concret builder
 class CheepComputerBuilder :public ComputerBuilder
 {
 public:
-	~CheepComputerBuilder()
-	{
+	~CheepComputerBuilder() { }
 
+	void setType()
+	{
+		computer->setType("CheepComputer");
 	}
 	void setCPU()
 	{
@@ -102,54 +120,86 @@ public:
 		computer->setDisk("Samsung 360 Gb");
 	}
 };
+
 class OfficeComputerBuilder :public ComputerBuilder
 {
 public:
-	~OfficeComputerBuilder()
-	{
+	~OfficeComputerBuilder() { }
 
+	void setType()
+	{
+		computer->setType("OfficeComputer");
 	}
 	void setCPU()
 	{
-		computer->setCPU("Ryzen 5");
+		computer->setCPU("Intel i5");
 	}
 	void setGPU()
 	{
-		computer->setGPU("GeForce GTX 1050 Ti");
+		computer->setGPU("GeForce GT 730 2 Gb");
 	}
 	void setRAM()
 	{
-		computer->setRAM("8 Gb");
+		computer->setRAM("16 Gb");
 	}
 	void setDisk()
 	{
-		computer->setDisk("Seagate BarraCuda 1 TB");
+		computer->setDisk("Goodram CX400 256 Gb");
 	}
 };
 
 class GameComputerBuilder :public ComputerBuilder
 {
 public:
-	~GameComputerBuilder()
+	~GameComputerBuilder() { }
+	void setType()
 	{
+		computer->setType("GameComputer");
 	}
 	void setCPU()
 	{
-		computer->setCPU("Ryzen 9");
+		computer->setCPU("Intel i9");
 	}
 	void setGPU()
 	{
-		computer->setGPU("GeForce RTX 3090 GAMING X TRIO");
+		computer->setGPU("GeForce RTX 3080 Ti 12 Gb");
 	}
 	void setRAM()
 	{
-		computer->setRAM("32 Gb");
+		computer->setRAM("64 Gb");
 	}
 	void setDisk()
 	{
-		computer->setDisk("Seagate BarraCuda 2 TB");
+		computer->setDisk("Samsung 980 PRO SSD M.2 PCI-E 4.0 x4 1000 Gb");
 	}
 };
+
+class ServerBuilder :public ComputerBuilder
+{
+public:
+	~ServerBuilder() { }
+	void setType()
+	{
+		computer->setType("ServerComputer");
+	}
+	void setCPU()
+	{
+		computer->setCPU("Intel Xeon E3");
+	}
+	void setGPU()
+	{
+		computer->setGPU("Maxtor");
+	}
+	void setRAM()
+	{
+		computer->setRAM("128 Gb ECC");
+	}
+	void setDisk()
+	{
+		computer->setDisk("Samsung 980 EVO 2 Tb");
+	}
+};
+
 //	Director
 class Sysadmin
 {
@@ -158,11 +208,11 @@ public:
 	void assamblayComputer(ComputerBuilder* comp_builder)
 	{
 		this->comp_builder = comp_builder;
+		comp_builder->setType();
 		comp_builder->setCPU();
 		comp_builder->setGPU();
 		comp_builder->setRAM();
 		comp_builder->setDisk();
-
 	}
 	void turnOnTheComputer()
 	{
@@ -170,22 +220,29 @@ public:
 		comp_builder->getComputer()->info();
 	}
 };
+
 void main()
 {
-	setlocale(LC_ALL, "rus");
+	setlocale(LC_ALL, "ru-RU");
 
 	Sysadmin nice_guy;
 
 	CheepComputerBuilder computer_for_bookkeper;
 	OfficeComputerBuilder office_computer;
 	GameComputerBuilder gaming_computer;
+	ServerBuilder server;
 
 	nice_guy.assamblayComputer(&computer_for_bookkeper);
 	nice_guy.turnOnTheComputer();
 
 	nice_guy.assamblayComputer(&office_computer);
-	nice_guy.turnOnTheComputer();
+	//nice_guy.turnOnTheComputer();
+	office_computer.getComputer()->power_button();
 
 	nice_guy.assamblayComputer(&gaming_computer);
 	nice_guy.turnOnTheComputer();
+
+	nice_guy.assamblayComputer(&server);
+	server.getComputer()->power_button();
+
 }
