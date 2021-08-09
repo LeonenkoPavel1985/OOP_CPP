@@ -9,11 +9,11 @@ class Computer
 	string GPU;
 	string RAM;
 	string Disk;
-	bool is_on;
+	bool on; // включение-выключение.
 public:
 	Computer()
 	{
-		is_on = false;
+		on = false;
 	}
 
 	void setCPU(const string CPU)
@@ -34,11 +34,11 @@ public:
 	}
 	void power_button()
 	{
-		is_on = is_on ? false : true;
+		on = on ? false : true;
 	}
 	void info()
 	{
-		if (is_on)
+		if (on)
 		{
 			cout << "System properties: " << endl;
 			cout << " CPU: " << CPU << endl;
