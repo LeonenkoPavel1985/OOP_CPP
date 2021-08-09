@@ -75,7 +75,7 @@ Singleton* Singleton::instance = nullptr;
 
 void main()
 {
-	setlocale(LC_ALL, "ru-RU");
+	setlocale(LC_ALL, "rus");
 #ifdef SINGLETON_1
 	//Singleton obj;
 

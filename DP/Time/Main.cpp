@@ -5,7 +5,7 @@ using namespace std;
 
 void main()
 {
-	setlocale(LC_ALL, "ru-RU");
+	setlocale(LC_ALL, "rus");
 
 	time_t timer;	//	timer - time_t - long long int
 

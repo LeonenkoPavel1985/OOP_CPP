@@ -172,7 +172,7 @@ public:
 };
 void main()
 {
-	setlocale(LC_ALL, "ru-RU");
+	setlocale(LC_ALL, "rus");
 
 	Sysadmin nice_guy;
 
