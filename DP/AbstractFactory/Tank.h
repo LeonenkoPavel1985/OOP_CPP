@@ -37,3 +37,14 @@ public:
 		return this->volume;
 	}
 };
+
+class SuvTank :public Tank
+{
+public:
+	SuvTank() :Tank(460) { }
+	~SuvTank() { }
+	unsigned int get_volume()const
+	{
+		return this->volume;
+	}
+};

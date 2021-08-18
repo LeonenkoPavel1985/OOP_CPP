@@ -38,3 +38,15 @@ public:
 		return this->power;
 	}
 };
+
+class SuvEngine :public Engine
+{
+public:
+	SuvEngine() :Engine(640) { }
+	~SuvEngine() { }
+
+	unsigned int get_power()const
+	{
+		return this->power;
+	}
+};
